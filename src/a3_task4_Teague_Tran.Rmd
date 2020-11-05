@@ -44,9 +44,15 @@ purple_urchins <- urchins %>%
 #select Naples Reefs observations of purple urchins in January 2010 + treatment
 jan2010_napurch <- purple_urchins %>%
   #filter out year = 2010, month = January (1), sites = Naples Reef
-  filter(year == "2010", month == "1", site_full == "Naples Reef" )  %>% 
+  filter(year == "2010", 
+         month == "1", 
+         site_full == "Naples Reef" )  %>% 
   #select columns "SIZE", "TREATMENT", "year", and "site_full"
-  select("SIZE", "TREATMENT", "year","month","site_full")
+  select("SIZE", 
+         "TREATMENT", 
+         "year",
+         "month",
+         "site_full")
   
 ```
 #### Looking at histograms and QQ plots for each treatment to assess normality
@@ -54,7 +60,8 @@ jan2010_napurch <- purple_urchins %>%
 #creating a histogram of size and treatment to assess normaility
 ggplot(data = jan2010_napurch, aes(x = SIZE)) +
   geom_histogram(bins = 15)+ 
-  facet_wrap("TREATMENT")
+  facet_wrap(~TREATMENT) +
+  labs(title = "Mean size of purple urchins at Naple Reef in 2010", x = "Size (cm)", y = "Count of purple sea urchins")
 ```
 ```{r,echo = TRUE, message = FALSE, warning = FALSE}
 #creating a QQ-plot to assess normaility
@@ -64,7 +71,7 @@ ggplot(data = jan2010_napurch, aes(sample = SIZE)) +
 ```
 
 
-The histogram shows that there are higher counts in the middle, while the QQ plots show a linear relationship in both treatments. This means that both histogram and QQ plot show that there is normal distribution in both annual and control treatments.
+The histogram shows that there are higher counts near the mean sizes, while the QQ plots show a linear relationship in both treatments. This means that both histogram and QQ plot show that there is normal distribution in both annual and control treatments. However, the histogram shows that there might be a larger distribution in in annual treatments than the control.
 
 
 #### Create a table of basic descriptive statistics for treatments
@@ -99,7 +106,7 @@ t.test(x= seaurchin_control, y = seaurchin_annual)
  
 ```
 
-The t-test shows that the means from the samples are close to each other (difference = .190861), which means that it is more likely that the null hypothesis (difference in means = 0) is true. The null hypothesis seems more likely to be true when you take into account that the difference in means is only approximately 5%. A p-value of .25 means that there is a 25% chance that you will get means that have a difference of at least .190861 if the null hypothesis is true.
+The t-test shows that the means from the samples are close to each other (difference = .190861), which means that it is more likely that the null hypothesis (difference in means = 0) is true. The null hypothesis seems more likely to be true when you take into account that the difference in means is only approximately 5%. A p-value of .25 means that there is a 25% chance that you will randomly get means that have a difference of at least .190861 if the null hypothesis is true (samples are drawn from the same population).
 
 
 % difference was calculated by subtracting mean control by mean annual and dividing by mean annual.
