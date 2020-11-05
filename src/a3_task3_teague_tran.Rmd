@@ -7,24 +7,103 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(kableExtra)
+library(lubridate)
+#Read in the .csv file
+urchins <- read_csv(here("data", "urchins.csv"))
 ```
 
-## R Markdown
+##Section 1: Size comparisions: purple vs red urchins
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#### ii Exploratory data visualization:
+```{r}
+#create faceted histogram to see spread of purple vs red urchin size
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+ggplot(data = urchins, aes(x = SIZE)) +
+  geom_histogram()+
+  facet_wrap("COMMON_NAME")
 
-```{r cars}
-summary(cars)
+#create box plot with common name on x-axis and size on y-axis
+
+ggplot(data = urchins, aes(x = COMMON_NAME, y = SIZE))+ 
+  geom_boxplot()+
+  labs(x = "Species", y = "Size (cm)")
+  
 ```
 
-## Including Plots
+#### ii) Descriptive statistics table:
+```{r}
+#Put summary statistics for sea urchin size into a summary table
 
-You can also embed plots, for example:
+summary_urchins <- urchins %>% 
+  group_by(COMMON_NAME) %>% 
+  summarize(mean_size = mean(SIZE),
+            median_size = median(SIZE),
+            sd_size = sd(SIZE),
+            n = n())
+# make table look a bit better, must find out how to separate better
+kable(summary_urchins, booktabs = T, caption = "Urchin size summary statistics",
+      col.names = c("Common name ",
+                " mean size (cm) ", 
+                "  median size (cm)  ",
+                "  standard deviation (cm)  ",
+                "urchin count  "))
+  
+```
+#### iii) Takeaways
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Both purple and red urchin have normally distributed data along a point, with red urchins having a wider spread (more variation). However, there is a 51.6% difference (~2.31 cm difference) in the mean and a 55% difference in median diameter (2.5cm difference).
+
+## Section 2: Explore purple urchin counts by site and year
+
+#### i)
+```{r}
+#filter to only purple urchins
+
+purple_urchins <- urchins %>%
+  filter(COMMON_NAME == "Purple Urchin") %>% 
+  #convert date to class date
+  mutate(date_new = mdy(DATE)) %>% 
+  #create new  "year" column with just years
+  mutate(year = year(date_new)) %>% 
+  #Create new column with full names of sites
+  mutate(site_full = (case_when(
+  SITE == "NAPL" ~ "Naples Reef",
+  SITE == "AQUE" ~ "Arroyo Quemado Reef",
+  SITE == "CARP" ~ "Carpinteria Reef",
+  SITE == "MOHK" ~ "Mohawk Reef",
+  SITE == "IVEE" ~ "Isla Vista Reef"
+    
+  )
+  )
+  )
+```
+#### ii)
+
+
+
+```{r}
+#Make a summary table containing the total number of purple urchins observed by site and year
+
+urchin_table <- purple_urchins %>% 
+  count(site_full, year)
+
+urchin_table  
+  
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#### iii)
+```{r}
+ggplot(urchin_table, aes(x = year, y = n)) +
+  geom_col()+ 
+  facet_wrap("site_full")+
+  labs(x = "Year", y = "Count (# purple urchin)", title = "Count of Purple Urchins per year at each site")
+```
+
+
+
+
+
+
