@@ -1,0 +1,119 @@
+---
+title: "a3_task4_Teague_Tran"
+author: "Teague Tran"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(kableExtra)
+library(lubridate)
+#Read in the .csv file
+urchins <- read_csv(here("data", "urchins.csv"))
+```
+#### Compare mean size of purple urchins in CONTROL and ANNUAL sections of Naples Reef in January 2010
+
+```{r,echo = TRUE, message = FALSE, warning = FALSE}
+#Code taken from task 3 that selects purple urchins + creates year + full site column that will be used in this section  ALSO ADDED MONTH THAT WAS NOT IN TASK 3.
+
+purple_urchins <- urchins %>%
+  #select only purple urchins
+  filter(COMMON_NAME == "Purple Urchin") %>% 
+  #convert date to class date
+  mutate(date_new = mdy(DATE)) %>% 
+  #create new  "year" column with just years
+  mutate(year = year(date_new)) %>% 
+  #create new "month" column with just months (WAS NOT IN TASK 3)
+  mutate(month = month(date_new)) %>% 
+  #Create new column with full names of sites
+  mutate(site_full = (case_when(
+  SITE == "NAPL" ~ "Naples Reef",
+  SITE == "AQUE" ~ "Arroyo Quemado Reef",
+  SITE == "CARP" ~ "Carpinteria Reef",
+  SITE == "MOHK" ~ "Mohawk Reef",
+  SITE == "IVEE" ~ "Isla Vista Reef"
+    
+  )
+  )
+  )
+```
+```{r}
+#select Naples Reefs observations of purple urchins in January 2010 + treatment
+jan2010_napurch <- purple_urchins %>%
+  #filter out year = 2010, month = January (1), sites = Naples Reef
+  filter(year == "2010", month == "1", site_full == "Naples Reef" )  %>% 
+  #select columns "SIZE", "TREATMENT", "year", and "site_full"
+  select("SIZE", "TREATMENT", "year","month","site_full")
+  
+```
+#### Looking at histograms and QQ plots for each treatment to assess normality
+```{r}
+#creating a histogram of size and treatment to assess normaility
+ggplot(data = jan2010_napurch, aes(x = SIZE)) +
+  geom_histogram(bins = 15)+ 
+  facet_wrap("TREATMENT")
+```
+```{r,echo = TRUE, message = FALSE, warning = FALSE}
+#creating a QQ-plot to assess normaility
+ggplot(data = jan2010_napurch, aes(sample = SIZE)) +
+      geom_qq()+
+      facet_wrap(~TREATMENT)
+```
+
+
+The histogram shows that there are higher counts in the middle, while the QQ plots show a linear relationship in both treatments. This means that both histogram and QQ plot show that there is normal distribution in both annual and control treatments.
+
+
+#### Create a table of basic descriptive statistics for treatments
+```{r,echo = TRUE, message = FALSE, warning = FALSE }
+#summary statistics including mean, median, standard deviation, and sample size
+urchin_summary <- jan2010_napurch %>% 
+  group_by(TREATMENT) %>% 
+  summarize(mean = mean(SIZE),
+            median = median(SIZE),
+            sd = sd(SIZE),
+            n = n())
+#show table
+urchin_summary
+```
+
+#### Perform a t-test looking at the means between the two treatments
+
+```{r,echo = TRUE, message = FALSE, warning = FALSE}
+# perform t-test on mean treatments
+seaurchin_ttest <- jan2010_napurch %>% 
+  group_by(TREATMENT)
+#separate out control
+seaurchin_control <- seaurchin_ttest %>% 
+  filter(TREATMENT == "CONTROL") %>% 
+  pull(SIZE)
+#separate out annual
+seaurchin_annual <- seaurchin_ttest %>% 
+  filter(TREATMENT == "ANNUAL") %>% 
+  pull(SIZE)
+#perform t-test on mean sizes
+t.test(x= seaurchin_control, y = seaurchin_annual)
+ 
+```
+
+The t-test shows that the means from the samples are close to each other (difference = .190861), which means that it is more likely that the null hypothesis (difference in means = 0) is true. The null hypothesis seems more likely to be true when you take into account that the difference in means is only approximately 5%. A p-value of .25 means that there is a 25% chance that you will get means that have a difference of at least .190861 if the null hypothesis is true.
+
+
+% difference was calculated by subtracting mean control by mean annual and dividing by mean annual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

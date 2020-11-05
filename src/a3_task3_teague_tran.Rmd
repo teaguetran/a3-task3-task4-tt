@@ -18,7 +18,7 @@ urchins <- read_csv(here("data", "urchins.csv"))
 ##Section 1: Size comparisions: purple vs red urchins
 
 #### ii Exploratory data visualization:
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 #create faceted histogram to see spread of purple vs red urchin size
 
 ggplot(data = urchins, aes(x = SIZE)) +
@@ -34,7 +34,7 @@ ggplot(data = urchins, aes(x = COMMON_NAME, y = SIZE))+
 ```
 
 #### ii) Descriptive statistics table:
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 #Put summary statistics for sea urchin size into a summary table
 
 summary_urchins <- urchins %>% 
@@ -54,15 +54,17 @@ kable(summary_urchins, booktabs = T, caption = "Urchin size summary statistics",
 ```
 #### iii) Takeaways
 
-Both purple and red urchin have normally distributed data along a point, with red urchins having a wider spread (more variation). However, there is a 51.6% difference (~2.31 cm difference) in the mean and a 55% difference in median diameter (2.5cm difference).
+Both purple and red urchin have normally distributed data along a point, with red urchins having a wider spread (more variation). However, there is a 51.6% difference (~2.31 cm difference) in the mean and a 55% difference in median diameter (2.5cm difference). 
+
+###### The percent difference was found by subtracting the purple urchin statistic from the red urchin statistic and dividing it by the purple urchin statistic.
 
 ## Section 2: Explore purple urchin counts by site and year
 
 #### i)
-```{r}
-#filter to only purple urchins
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 
 purple_urchins <- urchins %>%
+  #filter to only purple urchins
   filter(COMMON_NAME == "Purple Urchin") %>% 
   #convert date to class date
   mutate(date_new = mdy(DATE)) %>% 
@@ -84,7 +86,7 @@ purple_urchins <- urchins %>%
 
 
 
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 #Make a summary table containing the total number of purple urchins observed by site and year
 
 urchin_table <- purple_urchins %>% 
@@ -95,7 +97,7 @@ urchin_table
 ```
 
 #### iii)
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(urchin_table, aes(x = year, y = n)) +
   geom_col()+ 
   facet_wrap("site_full")+
