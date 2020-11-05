@@ -54,9 +54,9 @@ kable(summary_urchins, booktabs = T, caption = "Urchin size summary statistics",
 ```
 #### iii) Takeaways
 
-Both purple and red urchin have normally distributed data along a point, with red urchins having a wider spread (more variation). However, there is a 51.6% difference (~2.31 cm difference) in the mean and a 55% difference in median diameter (2.5cm difference). 
+Both purple and red urchin have normally distributed data along a point, with red urchins having a wider spread (more variation). However, there is a 41% difference (~2.31 cm difference) in the mean and a 43% difference in median diameter (2.5 cm difference). 
 
-###### The percent difference was found by subtracting the purple urchin statistic from the red urchin statistic and dividing it by the purple urchin statistic.
+###### The percent difference was found by subtracting the purple urchin statistic from the red urchin statistic and dividing it by the mean of the two statistic.
 
 ## Section 2: Explore purple urchin counts by site and year
 
@@ -72,11 +72,11 @@ purple_urchins <- urchins %>%
   mutate(year = year(date_new)) %>% 
   #Create new column with full names of sites
   mutate(site_full = (case_when(
-  SITE == "NAPL" ~ "Naples Reef",
-  SITE == "AQUE" ~ "Arroyo Quemado Reef",
-  SITE == "CARP" ~ "Carpinteria Reef",
-  SITE == "MOHK" ~ "Mohawk Reef",
-  SITE == "IVEE" ~ "Isla Vista Reef"
+    SITE == "NAPL" ~ "Naples Reef",
+    SITE == "AQUE" ~ "Arroyo Quemado Reef",
+    SITE == "CARP" ~ "Carpinteria Reef",
+    SITE == "MOHK" ~ "Mohawk Reef",
+    SITE == "IVEE" ~ "Isla Vista Reef"
     
   )
   )
@@ -93,7 +93,6 @@ urchin_table <- purple_urchins %>%
   count(site_full, year)
 
 urchin_table  
-  
 ```
 
 #### iii)
@@ -101,7 +100,7 @@ urchin_table
 ggplot(urchin_table, aes(x = year, y = n)) +
   geom_col()+ 
   facet_wrap("site_full")+
-  labs(x = "Year", y = "Count (# purple urchin)", title = "Count of Purple Urchins per year at each site")
+  labs(x = "Year", y = "Count (# purple urchin)", title = "Count of purple urchins per year at each site")
 ```
 
 
